@@ -28,6 +28,7 @@ public class App {
 
         engine.removeStopwords(stopwords);
 
+        System.out.println("AFTER STOPWORDS");
         engine.printCorpus();
 
     }
