@@ -22,7 +22,9 @@ public class App {
 
         Engine engine = new Engine();
 
-        engine.addCranfieldDocument(documents.get(0));
+        for (CranfieldDocument d : documents) {
+            engine.addCranfieldDocument(d);
+        }
 
         engine.printCorpus();
 

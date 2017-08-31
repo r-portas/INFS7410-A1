@@ -83,12 +83,20 @@ public class Engine {
         }
     }
 
+    /**
+     * Removes stop words from the corpus
+     * @param stopwords The stopwords to remove
+     */
     public void removeStopwords(List<String> stopwords) {
         for (String word : stopwords) {
             corpus.remove(word);
         }
     }
 
+    /**
+     * Print the frequency of words
+     * @param number The top number of words to print
+     */
     public void printFrequency(int number) {
         List<WordFreqPair> words = new ArrayList<WordFreqPair>();
 
@@ -107,9 +115,11 @@ public class Engine {
         }
     }
 
+    /**
+     * Prints a summary of the corpus
+     */
     public void printCorpus() {
         Set<String> tokens = corpus.keySet();
-
 
         int total = 0;
 
