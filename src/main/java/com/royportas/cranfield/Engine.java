@@ -3,6 +3,7 @@ package com.royportas.cranfield;
 import java.lang.Character;
 import java.lang.Comparable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,15 +23,31 @@ class WordFreqPair implements Comparable<WordFreqPair> {
     }
 }
 
+class IndexItem {
+    private int frequency;
+    private CranfieldDocument document;
+
+    public IndexItem(int frequency, CranfieldDocument document) {
+        this.frequency = frequency;
+        this.document = document;
+    }
+
+    public String toString() {
+        return "(" + document + ", " + frequency + ")";
+    }
+}
+
 /**
  * The engine of the search engine
  */
 public class Engine {
 
-    private HashMap<String, Integer> corpus;
+    private HashMap<String, List<IndexItem>> invertedIndex;
+    private List<String> stopwords;
 
-    public Engine() {
-        corpus = new HashMap<String, Integer>();
+    public Engine(List<String> stopwords) {
+        invertedIndex = new HashMap<String, List<IndexItem>>();
+        this.stopwords = stopwords;
     }
 
     public void addCranfieldDocument(CranfieldDocument document) {
@@ -41,14 +58,27 @@ public class Engine {
             documentCorpus += words;
         }
 
-        tokenize(documentCorpus);
+        HashMap<String, Integer> corpus = tokenize(documentCorpus);
+
+        // Add to the inverted index
+        for (String word : corpus.keySet()) {
+            if (invertedIndex.containsKey(word)) {
+                List<IndexItem> indexes = invertedIndex.get(word);
+                indexes.add(new IndexItem(corpus.get(word), document));
+            } else {
+                List<IndexItem> indexes = new ArrayList<IndexItem>();
+                indexes.add(new IndexItem(corpus.get(word), document));
+                invertedIndex.put(word, indexes);
+            }
+        }
     }
 
     /**
      * Tokenizes a document
      */
-    public void tokenize(String documentCorpus) {
+    private HashMap<String, Integer> tokenize(String documentCorpus) {
         String temp = "";
+        HashMap<String, Integer> corpus = new HashMap<String, Integer>();
 
         for (int i = 0; i < documentCorpus.length(); i++) {
             char c = documentCorpus.charAt(i);
@@ -60,21 +90,34 @@ public class Engine {
             } else {
                 // Non-alphanumeric
                 if (!temp.equals("")) {
-                    addWord(temp);
+                    addWord(corpus, temp);
                 }
                 temp = "";
             }
             
         }
         if (!temp.equals("")) {
-            addWord(temp);
+            addWord(corpus, temp);
         }
+
+        removeStopwords(corpus);
+
+        return corpus;
+
+    }
+
+    public List<CranfieldDocument> query(String query) {
+        String[] terms = query.split(" ");
+
+        // Combine results
+        // Sum of all frequencies in each document
+        HashMap<CranfieldDocument, Integer> results = new HashMap<CranfieldDocument, Integer>();
     }
 
     /**
      * Adds a word to the corpus
      */
-    private void addWord(String word) {
+    private void addWord(HashMap<String, Integer> corpus, String word) {
         if (corpus.containsKey(word)) {
             int current = corpus.get(word);
             corpus.put(word, current+1);
@@ -87,50 +130,15 @@ public class Engine {
      * Removes stop words from the corpus
      * @param stopwords The stopwords to remove
      */
-    public void removeStopwords(List<String> stopwords) {
+    public void removeStopwords(HashMap<String, Integer> corpus) {
         for (String word : stopwords) {
             corpus.remove(word);
         }
     }
 
-    /**
-     * Print the frequency of words
-     * @param number The top number of words to print
-     */
-    public void printFrequency(int number) {
-        List<WordFreqPair> words = new ArrayList<WordFreqPair>();
-
-        Set<String> tokens = corpus.keySet();
-
-        for (String token : tokens) {
-            WordFreqPair pair = new WordFreqPair(token, corpus.get(token));
-            words.add(pair);
-        }
-
-        Collections.sort(words);
-
-        for (int i = 0; i < number; i++) {
-            WordFreqPair pair = words.get(i);
-            System.out.println(pair.word + ": " + pair.freq);
+    public void printIndex() {
+        for (String word : invertedIndex.keySet()) {
+            System.out.println(word + ": " + invertedIndex.get(word));
         }
     }
-
-    /**
-     * Prints a summary of the corpus
-     */
-    public void printCorpus() {
-        Set<String> tokens = corpus.keySet();
-
-        int total = 0;
-
-        for (String token : tokens) {
-            total += corpus.get(token);
-        }
-
-        System.out.println("Total number of words: " + total);
-        System.out.println("Total number of unique words: " + tokens.size());
-
-        printFrequency(50);
-    }
-
 }

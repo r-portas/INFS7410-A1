@@ -20,18 +20,13 @@ public class App {
 
         List<CranfieldDocument> documents = FileLoader.loadCranfieldDocuments(args[0]);
 
-        Engine engine = new Engine();
+        Engine engine = new Engine(stopwords);
 
+        // engine.addCranfieldDocument(documents.get(0));
         for (CranfieldDocument d : documents) {
             engine.addCranfieldDocument(d);
         }
 
-        engine.printCorpus();
-
-        engine.removeStopwords(stopwords);
-
-        System.out.println("AFTER STOPWORDS");
-        engine.printCorpus();
-
+        engine.printIndex();
     }
 }

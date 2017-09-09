@@ -77,6 +77,6 @@ public class CranfieldDocument {
     }
 
     public String toString() {
-        return "Document [" + title + "]";
+        return title;
     }
 }
