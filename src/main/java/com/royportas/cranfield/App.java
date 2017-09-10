@@ -2,13 +2,15 @@ package com.royportas.cranfield;
 
 import java.util.List;
 import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Entrypoint of application
  *
  */
 public class App {
-
 
     public static void main( String[] args ) {
         if (args.length < 2) {
@@ -28,12 +30,39 @@ public class App {
             engine.addCranfieldDocument(d);
         }
 
-        // engine.printIndex();
-        String searchTerm = "vtol";
-        List<RankedDocument> docs = engine.query(searchTerm);
+        cli(engine);
+    }
 
-        for (int i = 0; i < 10; i++) {
-            System.out.println(docs.get(i));
+    private static void cli(Engine engine) {
+        BufferedReader reader = null;
+
+        try {
+            reader = new BufferedReader(new InputStreamReader(System.in));
+            
+            System.out.println("Enter query");
+
+            while (true) {
+                System.out.print(">> ");
+                System.out.flush();
+                String input = reader.readLine();
+
+                List<RankedDocument> docs = engine.query(input.trim());
+
+                for (int i = 0; i < 10; i++) {
+                    System.out.println(docs.get(i));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        try {
+            if (reader != null) {
+                reader.close(); 
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
