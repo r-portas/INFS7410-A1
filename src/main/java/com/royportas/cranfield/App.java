@@ -48,7 +48,15 @@ public class App {
 
                 List<RankedDocument> docs = engine.query(input.trim());
 
-                for (int i = 0; i < 10; i++) {
+                int results = 10;
+
+                if (docs.size() < results) {
+                    results = docs.size();
+                }
+
+                System.out.println("Displaying " + results + " search results");
+
+                for (int i = 0; i < results; i++) {
                     System.out.println(docs.get(i));
                 }
             }
