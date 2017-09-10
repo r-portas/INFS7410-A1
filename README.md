@@ -3,5 +3,4 @@
 ## Setup
 
 - Install `maven`
-- Clone repo
 - Run `mvn compile exec:java`

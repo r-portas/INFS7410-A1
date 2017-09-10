@@ -22,11 +22,18 @@ public class App {
 
         Engine engine = new Engine(stopwords);
 
+
         // engine.addCranfieldDocument(documents.get(0));
         for (CranfieldDocument d : documents) {
             engine.addCranfieldDocument(d);
         }
 
-        engine.printIndex();
+        // engine.printIndex();
+        String searchTerm = "vtol";
+        List<RankedDocument> docs = engine.query(searchTerm);
+
+        for (int i = 0; i < 10; i++) {
+            System.out.println(docs.get(i));
+        }
     }
 }

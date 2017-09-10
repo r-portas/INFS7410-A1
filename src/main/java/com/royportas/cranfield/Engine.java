@@ -9,17 +9,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-class WordFreqPair implements Comparable<WordFreqPair> {
-    String word;
-    int freq;
+class RankedDocument implements Comparable<RankedDocument> {
+    private CranfieldDocument doc;
+    private int freq;
 
-    public WordFreqPair(String word, int freq) {
-        this.word = word;
+    public RankedDocument(CranfieldDocument doc, int freq) {
+        this.doc = doc;
         this.freq = freq;
     }
 
-    public int compareTo(WordFreqPair other) {
+    public int compareTo(RankedDocument other) {
         return other.freq - this.freq;
+    }
+
+    public int getFrequency() {
+        return freq;
+    }
+
+    public CranfieldDocument getDocument() {
+        return doc;
+    }
+
+    public String toString() {
+        return "[" + freq + "] - " + doc;
     }
 }
 
@@ -34,6 +46,14 @@ class IndexItem {
 
     public String toString() {
         return "(" + document + ", " + frequency + ")";
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public CranfieldDocument getDocument() {
+        return document;
     }
 }
 
@@ -106,12 +126,38 @@ public class Engine {
 
     }
 
-    public List<CranfieldDocument> query(String query) {
+    public List<RankedDocument> query(String query) {
         String[] terms = query.split(" ");
 
         // Combine results
         // Sum of all frequencies in each document
         HashMap<CranfieldDocument, Integer> results = new HashMap<CranfieldDocument, Integer>();
+
+        for (String term : terms) {
+            List<IndexItem> items = invertedIndex.get(term);
+
+            if (items != null) {
+                for (IndexItem item : items) {
+                    CranfieldDocument doc = item.getDocument();
+                    if (results.containsKey(doc)) {
+                        int newFreq = item.getFrequency() + results.get(doc);
+                        results.put(doc, newFreq);
+                    } else {
+                        results.put(doc, item.getFrequency());
+                    }
+                }
+            }
+        }
+
+        List<RankedDocument> ranked = new ArrayList<RankedDocument>();
+        for (CranfieldDocument doc : results.keySet()) {
+            RankedDocument d = new RankedDocument(doc, results.get(doc));
+            ranked.add(d);
+        }
+
+        Collections.sort(ranked);
+
+        return ranked;
     }
 
     /**
