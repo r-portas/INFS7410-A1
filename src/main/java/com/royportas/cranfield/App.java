@@ -12,15 +12,20 @@ import java.io.InputStreamReader;
  */
 public class App {
 
-    public static void main( String[] args ) {
-        if (args.length < 2) {
-            System.out.println("Expected args: path/to/cranfield/docs path/to/stopwords.txt"); 
-            System.exit(0);
-        }
+    private static String docsDirectory;
+    private static String stopwordsFile;
+    private static BufferedReader reader;
 
-        List<String> stopwords = FileLoader.loadStopwordsFile(args[1]);
+    public static void main(String[] args) {
 
-        List<CranfieldDocument> documents = FileLoader.loadCranfieldDocuments(args[0]);
+        docsDirectory = "resources/cranfield";
+        stopwordsFile = "resources/common_words.txt";
+
+        getDirectories();
+
+        List<String> stopwords = FileLoader.loadStopwordsFile(stopwordsFile);
+
+        List<CranfieldDocument> documents = FileLoader.loadCranfieldDocuments(docsDirectory);
 
         Engine engine = new Engine(stopwords);
 
@@ -33,12 +38,37 @@ public class App {
         cli(engine);
     }
 
-    private static void cli(Engine engine) {
-        BufferedReader reader = null;
-
+    private static void getDirectories() {
         try {
             reader = new BufferedReader(new InputStreamReader(System.in));
-            
+
+            System.out.println("Enter Cranfield Document folder (default: '" + docsDirectory + "')");
+            System.out.print("> ");
+            System.out.flush();
+
+            String docs = reader.readLine().trim();
+            if (docs != "") {
+                docsDirectory = docs;
+            }
+
+
+            System.out.println("Enter stopwords file (default: '" + stopwordsFile + "')");
+            System.out.print("> ");
+            System.out.flush();
+
+            String sw = reader.readLine().trim();
+
+            if (sw != "") {
+                stopwordsFile = sw;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void cli(Engine engine) {
+        try {
             System.out.println("Enter query");
 
             while (true) {
