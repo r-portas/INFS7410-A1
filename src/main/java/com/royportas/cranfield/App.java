@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Instant;
+import java.time.Duration;
 
 /**
  * Entrypoint of application
@@ -35,6 +37,9 @@ public class App {
             engine.addCranfieldDocument(d);
         }
 
+        // Setup the vector model space once all cranfield documents has been loaded
+        engine.setupVectorModelSpace();
+
         cli(engine);
     }
 
@@ -47,7 +52,7 @@ public class App {
             System.out.flush();
 
             String docs = reader.readLine().trim();
-            if (docs != "") {
+            if (!docs.equals("")) {
                 docsDirectory = docs;
             }
 
@@ -58,7 +63,7 @@ public class App {
 
             String sw = reader.readLine().trim();
 
-            if (sw != "") {
+            if (!sw.equals("")) {
                 stopwordsFile = sw;
             }
 
@@ -69,6 +74,8 @@ public class App {
 
     private static void cli(Engine engine) {
         try {
+            engine.printTermFrequencies();
+
             System.out.println("Enter query");
 
             while (true) {
@@ -76,6 +83,7 @@ public class App {
                 System.out.flush();
                 String input = reader.readLine();
 
+                Instant startTime = Instant.now();
                 List<RankedDocument> docs = engine.query(input.trim());
 
                 int results = 10;
@@ -85,6 +93,11 @@ public class App {
                 }
 
                 System.out.println("Displaying " + results + " search results");
+
+                Instant endTime = Instant.now();
+                Duration dur = Duration.between(startTime, endTime);
+                System.out.println("Query took " + dur.toMillis() + " milliseconds");
+                
 
                 for (int i = 0; i < results; i++) {
                     System.out.println(docs.get(i));

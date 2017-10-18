@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+
 class RankedDocument implements Comparable<RankedDocument> {
     private CranfieldDocument doc;
     private int freq;
@@ -64,10 +65,20 @@ public class Engine {
 
     private HashMap<String, List<IndexItem>> invertedIndex;
     private List<String> stopwords;
+    private TermFrequency termFrequency;
+    /* The vector space model */
+    private VectorSpaceModel vsModel;
+
+    /* The document count */
+    private int documentCount;
 
     public Engine(List<String> stopwords) {
         invertedIndex = new HashMap<String, List<IndexItem>>();
+        termFrequency = new TermFrequency();
         this.stopwords = stopwords;
+        documentCount = 0;
+
+        vsModel = new VectorSpaceModel();
     }
 
     public void addCranfieldDocument(CranfieldDocument document) {
@@ -80,6 +91,9 @@ public class Engine {
 
         HashMap<String, Integer> corpus = tokenize(documentCorpus);
 
+        // Set the term frequencies, note this is after stopword removal
+        document.setTermFrequencies(corpus);
+
         // Add to the inverted index
         for (String word : corpus.keySet()) {
             if (invertedIndex.containsKey(word)) {
@@ -91,6 +105,34 @@ public class Engine {
                 invertedIndex.put(word, indexes);
             }
         }
+
+        documentCount++;
+
+    }
+
+    public void setupVectorModelSpace() {
+
+        HashMap<String, Integer> corpus = new HashMap<String, Integer>();
+
+        for (String word : invertedIndex.keySet()) {
+            int freq = 0;
+
+            for (IndexItem item : invertedIndex.get(word)) {
+                // Sum the number of documents that contain the terms
+                freq++;
+
+                // Sum the frequency of terms within each document
+                // freq += item.getFrequency();
+            }
+
+            corpus.put(word, freq);
+        }
+
+        // Add the corpus to the term frequencies
+        termFrequency.processCorpus(corpus);
+
+        vsModel.setCorpusTermDictionary(termFrequency);
+        vsModel.setNumberOfDocuments(documentCount);
     }
 
     /**
@@ -126,6 +168,9 @@ public class Engine {
 
     }
 
+    /**
+     * Performs a query
+     */
     public List<RankedDocument> query(String query) {
         String[] terms = query.split(" ");
 
@@ -182,9 +227,26 @@ public class Engine {
         }
     }
 
+    /**
+     * Print the term frequencies within the corpus
+     */
+    public void printTermFrequencies() {
+        termFrequency.printTermFrequencies();
+    }
+
+    private int getFrequency(List<IndexItem> items) {
+        int frequency = 0;
+
+        for (IndexItem item : items) {
+            frequency += item.getFrequency();
+        }
+
+        return frequency;
+    }
+
     public void printIndex() {
         for (String word : invertedIndex.keySet()) {
-            System.out.println(word + ": " + invertedIndex.get(word));
+            System.out.println(word + ", " + getFrequency(invertedIndex.get(word)));
         }
     }
 }

@@ -17,7 +17,11 @@ public class CranfieldDocument {
     /* The title of the document */
     private String title;
 
+    /* A map of sections to content */
     private HashMap<String, String> section;
+
+    /* The term frequencies of the document */
+    private HashMap<String, Integer> termFrequencies;
 
     /**
      * Constructs a document
@@ -38,6 +42,20 @@ public class CranfieldDocument {
 
     public Set<String> getSectionNames() {
         return section.keySet();
+    }
+
+    /**
+     * Sets the term frequencies of the document
+     */
+    public void setTermFrequencies(HashMap<String, Integer> termFreq) {
+        termFrequencies = termFreq; 
+    }
+
+    /**
+     * Get the term frequencies for the document
+     */
+    public HashMap<String, Integer> getTermFrequencies() {
+        return termFrequencies;
     }
 
     /**

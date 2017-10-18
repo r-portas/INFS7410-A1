@@ -1,4 +1,8 @@
-# Assignment 1
+# Assignment 2
+
+## Requirements
+- `java 8`
+- `maven`
 
 ## Setup
 
