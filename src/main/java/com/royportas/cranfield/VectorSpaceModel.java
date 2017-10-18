@@ -14,7 +14,7 @@ public class VectorSpaceModel {
     /* The term dictionary of the corpus */
     private HashMap<String, Integer> corpusTermDictionary;
 
-    /* The number of documents */
+    /* The total number of documents */
     private int N;
 
     public VectorSpaceModel() {
@@ -29,8 +29,11 @@ public class VectorSpaceModel {
         N = documents;
     }
 
+    /**
+     * Calculate the idf term
+     */
     public double idf(String word) {
-        return Math.log(N);
+        return Math.log(N / corpusTermDictionary.get(word));
     }
 
 }
