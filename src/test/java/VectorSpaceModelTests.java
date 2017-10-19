@@ -90,4 +90,15 @@ public class VectorSpaceModelTests {
         assertEquals(tfIdf, 0.15, 0.01);
     }
 
+    @Test
+    void testQueryVector1() {
+        String query[] = {"test", "cake", "cake"};
+
+
+        HashMap<String, Double> actual = vsModel.queryVector(query);
+
+        assertEquals(actual.get("test"), 0.3333, 0.01);
+        assertEquals(actual.get("cake"), 0.6666, 0.01);
+    }
+
 }

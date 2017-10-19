@@ -60,11 +60,62 @@ public class VectorSpaceModel {
         return termFreq / totalWords;
     }
 
-    /**
-     * Calculates the tfIdf term
-     */
     public double tfIdf(String word, CranfieldDocument c) {
         return tf(word, c) * idf(word);
+    }
+
+    /**
+     * Converts the query into a query vector
+     */
+    public HashMap<String, Double> queryVector(String[] terms) {
+        int termsNum = terms.length;
+
+        HashMap<String, Integer> cosine = new HashMap<String, Integer>();
+
+        for (String term : terms) {
+            int count = cosine.containsKey(term) ? cosine.get(term) : 0;
+            cosine.put(term, count + 1);
+        }
+
+        HashMap<String, Double> normalized = new HashMap<String, Double>();
+
+        for (String key : cosine.keySet()) {
+            int count = cosine.get(key);
+            normalized.put(key, (double)count / (double)termsNum);
+        }
+
+        return normalized;
+    }
+
+    public HashMap<String, Double> documentVector(String[] terms, CranfieldDocument d) {
+        HashMap<String, Double> vector = new HashMap<String, Double>();
+        for (String term : terms) {
+            vector.put(term, tfIdf(term, d));
+        }
+        return vector;
+    }
+
+    /**
+     * Calculates the cosine simularity between a term and a document
+     */
+    public double cosineSimularity(String[] terms, CranfieldDocument d) {
+        HashMap<String, Double> qv = queryVector(terms);
+        HashMap<String, Double> dv = documentVector(terms, d);
+
+        double dot = 0;
+        double qv_sum = 0;
+        double dv_sum = 0;
+
+        for (String term : terms) {
+            dot += qv.getOrDefault(term, 0.0) * dv.getOrDefault(term, 0.0);
+
+            qv_sum += Math.pow(qv.getOrDefault(term, 0.0), 2);
+            dv_sum += Math.pow(dv.getOrDefault(term, 0.0), 2);
+        }
+
+        double normalized = Math.sqrt(qv_sum) * Math.sqrt(dv_sum);
+
+        return dot / normalized;
     }
 
 }

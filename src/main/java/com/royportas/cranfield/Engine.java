@@ -69,12 +69,16 @@ public class Engine {
     /* The vector space model */
     private VectorSpaceModel vsModel;
 
+    /* A list of cranfield documents in the engine */
+    private List<CranfieldDocument> docs;
+
     /* The document count */
     private int documentCount;
 
     public Engine(List<String> stopwords) {
         invertedIndex = new HashMap<String, List<IndexItem>>();
         termFrequency = new TermFrequency();
+        docs = new ArrayList<CranfieldDocument>();
         this.stopwords = stopwords;
         documentCount = 0;
 
@@ -105,6 +109,9 @@ public class Engine {
                 invertedIndex.put(word, indexes);
             }
         }
+
+        // Add the document to the document list
+        docs.add(document);
 
         documentCount++;
 
@@ -166,6 +173,22 @@ public class Engine {
 
         return corpus;
 
+    }
+
+    /**
+     * Performs a search on the vector space model
+     */
+    public List<RankedDocument> vsModelQuery(String query) {
+        List<RankedDocument> ranked = new ArrayList<RankedDocument>();
+        String[] terms = query.split(" ");
+
+        for (CranfieldDocument d : docs) {
+            double simularity = vsModel.cosineSimularity(terms, d);
+            // TODO
+            // ranked.add(new RankedDocument(d, simularity);
+        }
+
+        return ranked;
     }
 
     /**
