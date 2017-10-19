@@ -23,6 +23,9 @@ public class CranfieldDocument {
     /* The term frequencies of the document */
     private HashMap<String, Integer> termFrequencies;
 
+    /* The total number of words in the documents */
+    private int totalWords;
+
     /**
      * Constructs a document
      *
@@ -45,10 +48,22 @@ public class CranfieldDocument {
     }
 
     /**
+     * Get the total number of words in the document
+     */
+    public int getTotalWords() {
+        return totalWords;
+    }
+
+    /**
      * Sets the term frequencies of the document
      */
     public void setTermFrequencies(HashMap<String, Integer> termFreq) {
         termFrequencies = termFreq; 
+
+        totalWords = 0;
+        for (String word : termFreq.keySet()) {
+            totalWords += termFreq.get(word);
+        }
     }
 
     /**
@@ -56,6 +71,15 @@ public class CranfieldDocument {
      */
     public HashMap<String, Integer> getTermFrequencies() {
         return termFrequencies;
+    }
+
+    /**
+     * Get the term frequency for a given word
+     *
+     * @param word The word
+     */
+    public int getTermFrequency(String word) {
+        return termFrequencies.get(word);
     }
 
     /**
