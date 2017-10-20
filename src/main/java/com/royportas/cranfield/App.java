@@ -72,9 +72,55 @@ public class App {
         }
     }
 
+    private static void vsQuery(Engine engine, String input) {
+        Instant startTime = Instant.now();
+        List<VSRankedDocument> docs = engine.vsModelQuery(input.trim());
+
+        int results = 10;
+
+        if (docs.size() < results) {
+            results = docs.size();
+        }
+
+        System.out.println("Displaying " + results + " search results");
+
+        Instant endTime = Instant.now();
+        Duration dur = Duration.between(startTime, endTime);
+        System.out.println("Query took " + dur.toMillis() + " milliseconds");
+        
+
+        for (int i = 0; i < results; i++) {
+            System.out.println(docs.get(i));
+        }
+
+    }
+
+    private static void query(Engine engine, String input) {
+        Instant startTime = Instant.now();
+        List<RankedDocument> docs = engine.query(input.trim());
+
+        int results = 10;
+
+        if (docs.size() < results) {
+            results = docs.size();
+        }
+
+        System.out.println("Displaying " + results + " search results");
+
+        Instant endTime = Instant.now();
+        Duration dur = Duration.between(startTime, endTime);
+        System.out.println("Query took " + dur.toMillis() + " milliseconds");
+        
+
+        for (int i = 0; i < results; i++) {
+            System.out.println(docs.get(i));
+        }
+
+    }
+
     private static void cli(Engine engine) {
         try {
-            engine.printTermFrequencies();
+            // engine.printTermFrequencies();
 
             System.out.println("Enter query");
 
@@ -83,25 +129,7 @@ public class App {
                 System.out.flush();
                 String input = reader.readLine();
 
-                Instant startTime = Instant.now();
-                List<RankedDocument> docs = engine.query(input.trim());
-
-                int results = 10;
-
-                if (docs.size() < results) {
-                    results = docs.size();
-                }
-
-                System.out.println("Displaying " + results + " search results");
-
-                Instant endTime = Instant.now();
-                Duration dur = Duration.between(startTime, endTime);
-                System.out.println("Query took " + dur.toMillis() + " milliseconds");
-                
-
-                for (int i = 0; i < results; i++) {
-                    System.out.println(docs.get(i));
-                }
+                vsQuery(engine, input);
             }
         } catch (IOException e) {
             e.printStackTrace();

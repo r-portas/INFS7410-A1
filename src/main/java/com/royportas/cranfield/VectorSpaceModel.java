@@ -48,7 +48,11 @@ public class VectorSpaceModel {
      * Calculate the idf term
      */
     public double idf(String word) {
-        return Math.log10((double)N / (double)corpusTermDictionary.get(word));
+        if (corpusTermDictionary.containsKey(word)) {
+            return Math.log10((double)N / (double)corpusTermDictionary.get(word));
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -61,6 +65,7 @@ public class VectorSpaceModel {
     }
 
     public double tfIdf(String word, CranfieldDocument c) {
+        System.out.println(c);
         return tf(word, c) * idf(word);
     }
 

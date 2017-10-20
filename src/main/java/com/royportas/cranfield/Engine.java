@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Set;
 
 
+/**
+ * Used for inverted index
+ */
 class RankedDocument implements Comparable<RankedDocument> {
     private CranfieldDocument doc;
     private int freq;
@@ -33,6 +36,32 @@ class RankedDocument implements Comparable<RankedDocument> {
 
     public String toString() {
         return "[" + freq + "] - " + doc;
+    }
+}
+
+class VSRankedDocument implements Comparable<VSRankedDocument> {
+
+    public CranfieldDocument doc;
+    public double simularity;
+
+    public VSRankedDocument(CranfieldDocument doc, double simularity) {
+        this.doc = doc;
+        this.simularity = simularity;
+    }
+
+    public int compareTo(VSRankedDocument other) {
+        double diff = other.simularity - this.simularity;
+        if (diff > 0) {
+            return 1;
+        } else if (diff < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+
+    public String toString() {
+        return "[" + simularity + "] - " + doc;
     }
 }
 
@@ -178,15 +207,17 @@ public class Engine {
     /**
      * Performs a search on the vector space model
      */
-    public List<RankedDocument> vsModelQuery(String query) {
-        List<RankedDocument> ranked = new ArrayList<RankedDocument>();
+    public List<VSRankedDocument> vsModelQuery(String query) {
         String[] terms = query.split(" ");
+
+        List<VSRankedDocument> ranked = new ArrayList<VSRankedDocument>();
 
         for (CranfieldDocument d : docs) {
             double simularity = vsModel.cosineSimularity(terms, d);
-            // TODO
-            // ranked.add(new RankedDocument(d, simularity);
+            ranked.add(new VSRankedDocument(d, simularity));
         }
+
+        Collections.sort(ranked);
 
         return ranked;
     }

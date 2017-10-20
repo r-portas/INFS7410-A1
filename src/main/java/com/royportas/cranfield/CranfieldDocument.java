@@ -79,7 +79,9 @@ public class CranfieldDocument {
      * @param word The word
      */
     public int getTermFrequency(String word) {
-        return termFrequencies.get(word);
+        System.out.println(termFrequencies);
+        System.out.println(word);
+        return termFrequencies.getOrDefault(word, 0);
     }
 
     /**
