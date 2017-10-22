@@ -104,6 +104,7 @@ public class Engine {
     /* The document count */
     private int documentCount;
 
+
     public Engine(List<String> stopwords) {
         invertedIndex = new HashMap<String, List<IndexItem>>();
         termFrequency = new TermFrequency();
@@ -169,6 +170,8 @@ public class Engine {
 
         vsModel.setCorpusTermDictionary(termFrequency);
         vsModel.setNumberOfDocuments(documentCount);
+
+        System.out.println("Total number of documents: " + documentCount);
     }
 
     /**
@@ -256,6 +259,30 @@ public class Engine {
 
         Collections.sort(ranked);
 
+        return ranked;
+    }
+
+    /**
+     * Performs the combined query
+     */
+    public List<VSRankedDocument> combinedQuery(String query) {
+        String[] terms = query.split(" ");
+        List<RankedDocument> invertedResults = query(query);
+        List<VSRankedDocument> ranked = new ArrayList<VSRankedDocument>();
+        int results = 10;
+
+
+        if (docs.size() < results) {
+            results = docs.size();
+        }
+
+        for (int i = 0; i < results; i++) {
+            CranfieldDocument doc = invertedResults.get(i).getDocument();
+            double simularity = vsModel.cosineSimularity(terms, doc);
+            ranked.add(new VSRankedDocument(doc, simularity));
+        }
+
+        Collections.sort(ranked);
         return ranked;
     }
 

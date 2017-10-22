@@ -72,6 +72,29 @@ public class App {
         }
     }
 
+    private static void combinedQuery(Engine engine, String input) {
+        Instant startTime = Instant.now();
+        List<VSRankedDocument> docs = engine.combinedQuery(input.trim());
+
+        int results = 10;
+
+        if (docs.size() < results) {
+            results = docs.size();
+        }
+
+        System.out.println("Displaying " + results + " search results");
+
+        Instant endTime = Instant.now();
+        Duration dur = Duration.between(startTime, endTime);
+        System.out.println("Query took " + dur.toMillis() + " milliseconds");
+        
+
+        for (int i = 0; i < results; i++) {
+            System.out.println(docs.get(i));
+        }
+
+    }
+
     private static void vsQuery(Engine engine, String input) {
         Instant startTime = Instant.now();
         List<VSRankedDocument> docs = engine.vsModelQuery(input.trim());
@@ -129,7 +152,8 @@ public class App {
                 System.out.flush();
                 String input = reader.readLine();
 
-                vsQuery(engine, input);
+                // vsQuery(engine, input);
+                combinedQuery(engine, input);
             }
         } catch (IOException e) {
             e.printStackTrace();

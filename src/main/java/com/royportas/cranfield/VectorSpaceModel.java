@@ -45,6 +45,13 @@ public class VectorSpaceModel {
     }
 
     /**
+     * Returns the number of documents in the engine
+     */
+    public int getNumberOfDocument() {
+        return N;
+    }
+
+    /**
      * Calculate the idf term
      */
     public double idf(String word) {
@@ -65,7 +72,6 @@ public class VectorSpaceModel {
     }
 
     public double tfIdf(String word, CranfieldDocument c) {
-        System.out.println(c);
         return tf(word, c) * idf(word);
     }
 
@@ -112,6 +118,7 @@ public class VectorSpaceModel {
         double dv_sum = 0;
 
         for (String term : terms) {
+            // System.out.println("qv: " + qv.getOrDefault(term, 0.0) + ", dv: " +  dv.getOrDefault(term, 0.0));
             dot += qv.getOrDefault(term, 0.0) * dv.getOrDefault(term, 0.0);
 
             qv_sum += Math.pow(qv.getOrDefault(term, 0.0), 2);
@@ -119,6 +126,12 @@ public class VectorSpaceModel {
         }
 
         double normalized = Math.sqrt(qv_sum) * Math.sqrt(dv_sum);
+
+        // System.out.println(":: " + dot + " / " + normalized);
+
+        if (normalized == 0.0) {
+            return 0.0;
+        }
 
         return dot / normalized;
     }
